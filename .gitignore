@@ -1,0 +1,23 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables
+.env
+.env.*
+
+# ChromaDB
+# If you want to keep your local db in source control, you can comment this out,
+# but it's recommended to use a Railway Volume for production data.
+chroma_db/
+
+# MacOS
+.DS_Store
