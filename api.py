@@ -81,7 +81,7 @@ async def webhook_events(request: Request):
             
             # Solo procesar si el mensaje NO fue enviado por nosotros mismos
             if key.get("fromMe") is False:
-                from_number = key.get("cleanedSenderPn")
+                from_number = key.get("cleanedSenderPn") or key.get("remoteJid")
                 msg_text = messages.get("messageBody")
                 
                 if from_number and msg_text:

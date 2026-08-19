@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 async def send_whatsapp_message(to_number: str, message_body: str):
     # Wappfly requiere el formato número@s.whatsapp.net
-    if "@s.whatsapp.net" not in to_number and "@g.us" not in to_number:
+    if "@" not in to_number:
         to_number = f"{to_number}@s.whatsapp.net"
         
     token = os.environ.get("WAPPFLY_API_TOKEN")
