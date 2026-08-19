@@ -22,20 +22,21 @@ class QueryResponse(BaseModel):
     answer: str
     context_used: list[str]
 
-@router.post("/upload-pdf/")
-async def upload_pdf(file: UploadFile = File(...)):
-    if not file.filename.endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+@router.post("/upload-document/")
+async def upload_document(file: UploadFile = File(...)):
+    if not (file.filename.endswith('.pdf') or file.filename.endswith('.md') or file.filename.endswith('.txt')):
+        raise HTTPException(status_code=400, detail="Only PDF, MD, and TXT files are supported.")
     
     # Save uploaded file temporarily
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
             contents = await file.read()
             tmp.write(contents)
             tmp_path = tmp.name
         
         # Process and store
-        num_chunks = rag.process_and_store_pdf(tmp_path, file.filename)
+        num_chunks = rag.process_and_store_document(tmp_path, file.filename)
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

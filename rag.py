@@ -53,14 +53,19 @@ def get_collection():
         embedding_function=embedding_function
     )
 
-def extract_text_from_pdf(file_path: str) -> str:
-    reader = PdfReader(file_path)
-    text = ""
-    for page in reader.pages:
-        page_text = page.extract_text()
-        if page_text:
-            text += page_text + "\n"
-    return text
+def extract_text_from_file(file_path: str) -> str:
+    if file_path.lower().endswith('.pdf'):
+        reader = PdfReader(file_path)
+        text = ""
+        for page in reader.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
+        return text
+    else:
+        # For .md, .txt, etc.
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return f.read()
 
 def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200):
     chunks = []
@@ -71,8 +76,8 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200):
         start += chunk_size - overlap
     return chunks
 
-def process_and_store_pdf(file_path: str, filename: str):
-    text = extract_text_from_pdf(file_path)
+def process_and_store_document(file_path: str, filename: str):
+    text = extract_text_from_file(file_path)
     chunks = chunk_text(text)
     
     if not chunks:
