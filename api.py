@@ -93,10 +93,12 @@ async def webhook_events(request: Request):
                 # Debemos usar el número de teléfono limpio, pero corrigiendo el "521" de México.
                 phone_number = key.get("cleanedSenderPn") or key.get("remoteJid")
                 
-                if phone_number and phone_number.startswith("521") and len(phone_number) >= 12:
-                    phone_number = "52" + phone_number[3:]
+                # Comentamos la eliminación del "1" para México. 
+                # Las APIs no oficiales (como Wappfly/Baileys) suelen requerir el número exacto del que provino (con el 1).
+                # if phone_number and phone_number.startswith("521") and len(phone_number) >= 12:
+                #     phone_number = "52" + phone_number[3:]
                     
-                # Usaremos el número de teléfono corregido como identificador principal
+                # Usaremos el número de teléfono original como identificador principal
                 from_number = phone_number
                     
                 msg_text = messages.get("messageBody")
