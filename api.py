@@ -90,6 +90,12 @@ async def webhook_events(request: Request):
             # Solo procesar si el mensaje NO fue enviado por nosotros mismos
             if key.get("fromMe") is False:
                 from_number = key.get("cleanedSenderPn") or key.get("remoteJid")
+                
+                # CORRECCIÓN VITAL PARA MÉXICO: Wappfly/Baileys a veces envía el número con "521" 
+                # pero falla en silencio al intentar responder a un "521". Debe ser "52".
+                if from_number and from_number.startswith("521") and len(from_number) >= 12:
+                    from_number = "52" + from_number[3:]
+                    
                 msg_text = messages.get("messageBody")
                 
                 if from_number and msg_text:
