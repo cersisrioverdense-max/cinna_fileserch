@@ -150,11 +150,11 @@ async def process_buffered_message(from_number: str):
             if not answer:
                 answer = "Le he avisado a la escuela. Un asesor se pondrá en contacto contigo pronto a este número."
             
-            # Avisar al número de la escuela
-            # TODO: Cambiar por el número real de la escuela
-            numero_escuela = "524871558316" 
+            # Avisar a los números de la escuela
+            numeros_escuela = ["524871569878", "524871126942"]
             mensaje_alerta = f"🚨 *Alerta de Contacto* 🚨\nEl usuario con número {from_number} quiere hablar con un asesor.\n\nMensaje que envió:\n\"{msg_text}\""
-            await send_whatsapp_message(numero_escuela, mensaje_alerta)
+            for num in numeros_escuela:
+                await send_whatsapp_message(num, mensaje_alerta)
             
         await send_whatsapp_message(from_number, answer)
     except Exception as e:

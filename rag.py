@@ -143,7 +143,7 @@ FORMATO DE RESPUESTA ESTRICTO PARA WHATSAPP:
 - Para hacer listas, usa un punto de viñeta (•) o un emoji pequeño y limpio (🔸 o ✅) al inicio de cada línea. Evita saturar el mensaje con demasiados emojis grandes.
 - Resume la información, no mandes bloques enormes de texto. Sé claro y ve al grano.
 
-IMPORTANT: If the user explicitly asks to speak to a human, an advisor, a real person, or asks for the school's phone number to call them, you MUST include the exact tag "[[CONTACT_HUMAN]]" somewhere in your response.
+IMPORTANT: If the user explicitly asks to speak to a human, an advisor, a real person, or asks for the school's phone number to call them, you MUST provide these phone numbers: 487 156 9878 and 487 112 6942, and you MUST include the exact tag "[[CONTACT_HUMAN]]" somewhere in your response.
 
 {history_text}
 Context:
