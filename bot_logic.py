@@ -24,7 +24,7 @@ async def send_whatsapp_message(to_number: str, message_body: str):
     }
     
     data = {
-        "jid": to_number,
+        "to": to_number,
         "text": message_body
     }
     

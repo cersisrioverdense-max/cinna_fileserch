@@ -89,17 +89,14 @@ async def webhook_events(request: Request):
             
             # Solo procesar si el mensaje NO fue enviado por nosotros mismos
             if key.get("fromMe") is False:
-                # Wappfly's API falla en silencio si intentamos responder a un @lid.
-                # Debemos usar el número de teléfono limpio, pero corrigiendo el "521" de México.
-                phone_number = key.get("cleanedSenderPn") or key.get("remoteJid")
-                
-                # Comentamos la eliminación del "1" para México. 
-                # Las APIs no oficiales (como Wappfly/Baileys) suelen requerir el número exacto del que provino (con el 1).
-                # if phone_number and phone_number.startswith("521") and len(phone_number) >= 12:
-                #     phone_number = "52" + phone_number[3:]
+                # En mensajes provenientes de Click-to-WhatsApp o con addressingMode='lid',
+                # DEBEMOS responder directamente al @lid, de lo contrario la API dirá 200 OK pero WhatsApp no lo entregará.
+                if key.get("addressingMode") == "lid" and key.get("remoteJid"):
+                    from_number = key.get("remoteJid")
+                else:
+                    from_number = key.get("senderPn") or key.get("cleanedSenderPn") or key.get("remoteJid")
                     
-                # Usaremos el número de teléfono original como identificador principal
-                from_number = phone_number
+                # Nos aseguramos de mantener el ID exacto que mandó Wappfly
                     
                 msg_text = messages.get("messageBody")
                 
