@@ -89,13 +89,15 @@ async def webhook_events(request: Request):
             
             # Solo procesar si el mensaje NO fue enviado por nosotros mismos
             if key.get("fromMe") is False:
-                # Wappfly using multi-device may require replying to the 'remoteJid' (e.g. @lid)
-                from_number = key.get("remoteJid")
-                phone_number = key.get("cleanedSenderPn")
+                # Wappfly's API falla en silencio si intentamos responder a un @lid.
+                # Debemos usar el número de teléfono limpio, pero corrigiendo el "521" de México.
+                phone_number = key.get("cleanedSenderPn") or key.get("remoteJid")
                 
-                # Fix Mexico 521 issue for phone number display
                 if phone_number and phone_number.startswith("521") and len(phone_number) >= 12:
                     phone_number = "52" + phone_number[3:]
+                    
+                # Usaremos el número de teléfono corregido como identificador principal
+                from_number = phone_number
                     
                 msg_text = messages.get("messageBody")
                 
@@ -108,7 +110,7 @@ async def webhook_events(request: Request):
                         # Concatenar el mensaje
                         message_buffers[from_number]["text"] += "\n" + msg_text
                     else:
-                        message_buffers[from_number] = {"text": msg_text, "phone": phone_number}
+                        message_buffers[from_number] = {"text": msg_text, "phone": from_number}
                         
                     # Crear nueva tarea para procesar el mensaje con debounce
                     task = asyncio.create_task(process_buffered_message(from_number))
