@@ -89,12 +89,13 @@ async def webhook_events(request: Request):
             
             # Solo procesar si el mensaje NO fue enviado por nosotros mismos
             if key.get("fromMe") is False:
-                from_number = key.get("cleanedSenderPn") or key.get("remoteJid")
+                # Wappfly using multi-device may require replying to the 'remoteJid' (e.g. @lid)
+                from_number = key.get("remoteJid")
+                phone_number = key.get("cleanedSenderPn")
                 
-                # CORRECCIÓN VITAL PARA MÉXICO: Wappfly/Baileys a veces envía el número con "521" 
-                # pero falla en silencio al intentar responder a un "521". Debe ser "52".
-                if from_number and from_number.startswith("521") and len(from_number) >= 12:
-                    from_number = "52" + from_number[3:]
+                # Fix Mexico 521 issue for phone number display
+                if phone_number and phone_number.startswith("521") and len(phone_number) >= 12:
+                    phone_number = "52" + phone_number[3:]
                     
                 msg_text = messages.get("messageBody")
                 
@@ -107,7 +108,7 @@ async def webhook_events(request: Request):
                         # Concatenar el mensaje
                         message_buffers[from_number]["text"] += "\n" + msg_text
                     else:
-                        message_buffers[from_number] = {"text": msg_text}
+                        message_buffers[from_number] = {"text": msg_text, "phone": phone_number}
                         
                     # Crear nueva tarea para procesar el mensaje con debounce
                     task = asyncio.create_task(process_buffered_message(from_number))
@@ -131,6 +132,7 @@ async def process_buffered_message(from_number: str):
         return
         
     msg_text = buffer_data["text"]
+    user_phone = buffer_data.get("phone") or from_number
     print(f"-> Procesando mensaje unificado de {from_number}:\n{msg_text}")
     
     # Manejo de la sesión (historial y última interacción)
@@ -166,7 +168,7 @@ async def process_buffered_message(from_number: str):
             
             # Avisar a los números de la escuela
             numeros_escuela = ["524871569878", "524871126942"]
-            mensaje_alerta = f"🚨 *Alerta de Contacto* 🚨\nEl usuario con número {from_number} quiere hablar con un asesor.\n\nMensaje que envió:\n\"{msg_text}\""
+            mensaje_alerta = f"🚨 *Alerta de Contacto* 🚨\nEl usuario con número {user_phone} quiere hablar con un asesor.\n\nMensaje que envió:\n\"{msg_text}\""
             for num in numeros_escuela:
                 await send_whatsapp_message(num, mensaje_alerta)
             
