@@ -37,11 +37,9 @@ Para formalizar la inscripción en la modalidad escolarizada, se debe entregar l
    * *Especificaciones obligatorias para fotos:* Papel mate, camisa blanca, sin maquillaje, sin lentes y sin aretes. Hombres con cabello corto, sin barba y sin bigote; mujeres con cabello recogido.
 
 ### Criterios de Admisión por Edad y Transferencias (Cambio de Prepa)
-* **Ingreso a Primer Año:**
-  * Alumnos de **18 años o menos:** Ingresan al sistema escolarizado regular.
-  * Alumnos **mayores de 18 años:** Se recomienda canalizarlos a la modalidad Sabatina.
-* **Ingreso a Segundo Año:**
-  * Alumnos de **18, 19 o 20 años:** Pueden ingresar al sistema escolarizado de segundo año (no se recomienda la modalidad sabatina para segundo año).
+* **Criterios de Edad:**
+  * Jóvenes de **14 a 17 años:** Aplican para la preparatoria escolarizada regular (lunes a viernes).
+  * Alumnos de **18 años en adelante:** Aplican de manera exclusiva para la preparatoria Sabatina (sábados).
 * **Trámite de Cambio de Escuela (Transferencias):**
   * Requiere presentar previamente **boleta de calificaciones** y **constancia de estudios con calificaciones**.
   * Tras evaluar los documentos, se programa una entrevista de admisión diagnóstica para dictaminar el ingreso.
