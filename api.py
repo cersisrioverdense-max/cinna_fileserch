@@ -1,5 +1,6 @@
 import os
 import tempfile
+import random
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 import rag
@@ -12,7 +13,7 @@ router = APIRouter()
 
 message_buffers = {}
 user_sessions = {}
-DEBOUNCE_TIME = 7.0
+DEBOUNCE_TIME = 3.0  # Espera 3s por si llegan más mensajes seguidos
 SESSION_TIMEOUT = 7200 # 2 hours
 
 class QueryRequest(BaseModel):
@@ -173,7 +174,13 @@ async def process_buffered_message(from_number: str):
             for num in numeros_escuela:
                 await send_whatsapp_message(num, mensaje_alerta)
             
+        # Delay aleatorio para simular escritura humana y evitar detección de bot
+        typing_delay = random.uniform(2.0, 6.0)
+        print(f"-> Simulando escritura ({typing_delay:.1f}s) antes de responder a {from_number}")
+        await asyncio.sleep(typing_delay)
+        
         await send_whatsapp_message(from_number, answer)
     except Exception as e:
         print(f"Error en RAG: {e}")
         await send_whatsapp_message(from_number, "Lo siento, ocurrió un error procesando tu consulta.")
+
