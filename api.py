@@ -76,7 +76,15 @@ async def webhook_events(request: Request):
     try:
         if body.get("event") == "messages.received":
             data = body.get("data", {})
-            messages = data.get("messages", {})
+            
+            raw_messages = data.get("messages")
+            if isinstance(raw_messages, list) and len(raw_messages) > 0:
+                messages = raw_messages[0]
+            elif isinstance(raw_messages, dict):
+                messages = raw_messages
+            else:
+                messages = {}
+
             key = messages.get("key", {})
             
             # Solo procesar si el mensaje NO fue enviado por nosotros mismos
