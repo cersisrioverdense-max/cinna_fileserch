@@ -104,22 +104,42 @@ async def webhook_events(request: Request):
                 if from_number and msg_text:
                     print(f"-> Recibido fragmento de {from_number}: {msg_text}")
                     
-                    if from_number in message_buffers:
-                        # Cancelar tarea anterior
-                        message_buffers[from_number]["task"].cancel()
-                        # Concatenar el mensaje
-                        message_buffers[from_number]["text"] += "\n" + msg_text
+                    # Detección directa de keyword "asesor" — no pasa por la IA
+                    if msg_text.strip().lower() in ["asesor", "asesor.", "asesor!", "quiero un asesor", "quiero asesor"]:
+                        print(f"-> Keyword 'asesor' detectado de {from_number}, enviando alerta directa.")
+                        asyncio.create_task(handle_asesor_request(from_number, msg_text))
                     else:
-                        message_buffers[from_number] = {"text": msg_text, "phone": from_number}
-                        
-                    # Crear nueva tarea para procesar el mensaje con debounce
-                    task = asyncio.create_task(process_buffered_message(from_number))
-                    message_buffers[from_number]["task"] = task
+                        if from_number in message_buffers:
+                            # Cancelar tarea anterior
+                            message_buffers[from_number]["task"].cancel()
+                            # Concatenar el mensaje
+                            message_buffers[from_number]["text"] += "\n" + msg_text
+                        else:
+                            message_buffers[from_number] = {"text": msg_text, "phone": from_number}
+                            
+                        # Crear nueva tarea para procesar el mensaje con debounce
+                        task = asyncio.create_task(process_buffered_message(from_number))
+                        message_buffers[from_number]["task"] = task
                     
     except Exception as e:
         print(f"Error al procesar webhook de Wappfly: {e}")
     
     return {"status": "success"}
+
+async def handle_asesor_request(from_number: str, msg_text: str):
+    """Maneja la solicitud de asesor directamente, sin pasar por la IA."""
+    typing_delay = random.uniform(1.5, 3.0)
+    await asyncio.sleep(typing_delay)
+    
+    # Responder al usuario
+    respuesta = "¡Claro! 😊 Le avisaré a uno de nuestros asesores para que se ponga en contacto contigo a la brevedad."
+    await send_whatsapp_message(from_number, respuesta)
+    
+    # Notificar al asesor
+    numero_asesor = "524445483232"
+    mensaje_alerta = f"🚨 *Solicitud de Asesor* 🚨\nEl usuario con número {from_number} solicitó hablar con un asesor escribiendo 'asesor'."
+    await send_whatsapp_message(numero_asesor, mensaje_alerta)
+    print(f"-> Alerta de asesor enviada al número de la escuela por solicitud de {from_number}")
 
 async def process_buffered_message(from_number: str):
     try:
