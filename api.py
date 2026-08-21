@@ -168,11 +168,10 @@ async def process_buffered_message(from_number: str):
             if not answer:
                 answer = "Le he avisado a la escuela. Un asesor se pondrá en contacto contigo pronto a este número."
             
-            # Avisar a los números de la escuela
-            numeros_escuela = ["524871569878", "524871126942"]
+            # Avisar al número de contacto de la escuela
+            numero_asesor = "524445483232"
             mensaje_alerta = f"🚨 *Alerta de Contacto* 🚨\nEl usuario con número {user_phone} quiere hablar con un asesor.\n\nMensaje que envió:\n\"{msg_text}\""
-            for num in numeros_escuela:
-                await send_whatsapp_message(num, mensaje_alerta)
+            await send_whatsapp_message(numero_asesor, mensaje_alerta)
             
         # Delay aleatorio para simular escritura humana y evitar detección de bot
         typing_delay = random.uniform(2.0, 6.0)
