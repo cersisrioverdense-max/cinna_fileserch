@@ -96,8 +96,9 @@ async def webhook_events(request: Request):
                     from_number = key.get("remoteJid")
                 else:
                     from_number = key.get("senderPn") or key.get("cleanedSenderPn") or key.get("remoteJid")
-                    
-                # Nos aseguramos de mantener el ID exacto que mandó Wappfly
+                
+                # Número legible para mostrar en alertas (sin el @lid)
+                display_phone = key.get("cleanedSenderPn") or key.get("senderPn") or from_number
                     
                 msg_text = messages.get("messageBody")
                 
@@ -107,7 +108,7 @@ async def webhook_events(request: Request):
                     # Detección directa de keyword "asesor" — no pasa por la IA
                     if msg_text.strip().lower() in ["asesor", "asesor.", "asesor!", "quiero un asesor", "quiero asesor"]:
                         print(f"-> Keyword 'asesor' detectado de {from_number}, enviando alerta directa.")
-                        asyncio.create_task(handle_asesor_request(from_number, msg_text))
+                        asyncio.create_task(handle_asesor_request(from_number, msg_text, display_phone))
                     else:
                         if from_number in message_buffers:
                             # Cancelar tarea anterior
@@ -115,7 +116,7 @@ async def webhook_events(request: Request):
                             # Concatenar el mensaje
                             message_buffers[from_number]["text"] += "\n" + msg_text
                         else:
-                            message_buffers[from_number] = {"text": msg_text, "phone": from_number}
+                            message_buffers[from_number] = {"text": msg_text, "phone": from_number, "display_phone": display_phone}
                             
                         # Crear nueva tarea para procesar el mensaje con debounce
                         task = asyncio.create_task(process_buffered_message(from_number))
@@ -126,7 +127,7 @@ async def webhook_events(request: Request):
     
     return {"status": "success"}
 
-async def handle_asesor_request(from_number: str, msg_text: str):
+async def handle_asesor_request(from_number: str, msg_text: str, display_phone: str = None):
     """Maneja la solicitud de asesor directamente, sin pasar por la IA."""
     typing_delay = random.uniform(1.5, 3.0)
     await asyncio.sleep(typing_delay)
@@ -135,9 +136,12 @@ async def handle_asesor_request(from_number: str, msg_text: str):
     respuesta = "¡Claro! 😊 Le avisaré a uno de nuestros asesores para que se ponga en contacto contigo a la brevedad."
     await send_whatsapp_message(from_number, respuesta)
     
+    # Usar el número legible para la alerta, o el from_number si no hay otro
+    numero_legible = display_phone or from_number
+    
     # Notificar al asesor usando su @lid (formato requerido por Wappfly para entrega)
     numero_asesor = "271549491880097@lid"
-    mensaje_alerta = f"🚨 *Solicitud de Asesor* 🚨\nEl usuario con número {from_number} solicitó hablar con un asesor escribiendo 'asesor'."
+    mensaje_alerta = f"🚨 *Solicitud de Asesor* 🚨\nEl usuario con número +{numero_legible} solicitó hablar con un asesor."
     await send_whatsapp_message(numero_asesor, mensaje_alerta)
     print(f"-> Alerta de asesor enviada al número de la escuela por solicitud de {from_number}")
 
@@ -154,7 +158,7 @@ async def process_buffered_message(from_number: str):
         return
         
     msg_text = buffer_data["text"]
-    user_phone = buffer_data.get("phone") or from_number
+    user_phone = buffer_data.get("display_phone") or buffer_data.get("phone") or from_number
     print(f"-> Procesando mensaje unificado de {from_number}:\n{msg_text}")
     
     # Manejo de la sesión (historial y última interacción)
