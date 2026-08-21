@@ -135,8 +135,8 @@ async def handle_asesor_request(from_number: str, msg_text: str):
     respuesta = "¡Claro! 😊 Le avisaré a uno de nuestros asesores para que se ponga en contacto contigo a la brevedad."
     await send_whatsapp_message(from_number, respuesta)
     
-    # Notificar al asesor
-    numero_asesor = "524445483232"
+    # Notificar al asesor usando su @lid (formato requerido por Wappfly para entrega)
+    numero_asesor = "271549491880097@lid"
     mensaje_alerta = f"🚨 *Solicitud de Asesor* 🚨\nEl usuario con número {from_number} solicitó hablar con un asesor escribiendo 'asesor'."
     await send_whatsapp_message(numero_asesor, mensaje_alerta)
     print(f"-> Alerta de asesor enviada al número de la escuela por solicitud de {from_number}")
@@ -188,8 +188,8 @@ async def process_buffered_message(from_number: str):
             if not answer:
                 answer = "Le he avisado a la escuela. Un asesor se pondrá en contacto contigo pronto a este número."
             
-            # Avisar al número de contacto de la escuela
-            numero_asesor = "524445483232"
+            # Avisar al asesor usando su @lid
+            numero_asesor = "271549491880097@lid"
             mensaje_alerta = f"🚨 *Alerta de Contacto* 🚨\nEl usuario con número {user_phone} quiere hablar con un asesor.\n\nMensaje que envió:\n\"{msg_text}\""
             await send_whatsapp_message(numero_asesor, mensaje_alerta)
             
